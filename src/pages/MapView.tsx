@@ -35,26 +35,70 @@ const MapView = () => {
         'top-right'
       );
 
-      // Sample data points
+      // Sample data points with different types and value ranges
       const sampleData = [
-        { coordinates: [-74.006, 40.7128] as [number, number], title: "New York", value: "156 μg/m³" },
-        { coordinates: [-118.2437, 34.0522] as [number, number], title: "Los Angeles", value: "89 μg/m³" },
-        { coordinates: [-87.6298, 41.8781] as [number, number], title: "Chicago", value: "67 μg/m³" },
-        { coordinates: [-95.3698, 29.7604] as [number, number], title: "Houston", value: "78 μg/m³" },
-        { coordinates: [-75.1652, 39.9526] as [number, number], title: "Philadelphia", value: "45 μg/m³" },
+        // Air Quality Data
+        { coordinates: [-74.006, 40.7128] as [number, number], title: "New York", value: "156 μg/m³", type: "Air Quality", numericValue: 156 },
+        { coordinates: [-118.2437, 34.0522] as [number, number], title: "Los Angeles", value: "89 μg/m³", type: "Air Quality", numericValue: 89 },
+        { coordinates: [-87.6298, 41.8781] as [number, number], title: "Chicago", value: "67 μg/m³", type: "Air Quality", numericValue: 67 },
+        { coordinates: [-95.3698, 29.7604] as [number, number], title: "Houston", value: "78 μg/m³", type: "Air Quality", numericValue: 78 },
+        { coordinates: [-75.1652, 39.9526] as [number, number], title: "Philadelphia", value: "45 μg/m³", type: "Air Quality", numericValue: 45 },
+        
+        // Water Quality Data
+        { coordinates: [-122.4194, 37.7749] as [number, number], title: "San Francisco Bay", value: "7.2 pH", type: "Water Quality", numericValue: 72 },
+        { coordinates: [-80.1918, 25.7617] as [number, number], title: "Miami Beach", value: "6.8 pH", type: "Water Quality", numericValue: 68 },
+        { coordinates: [-71.0589, 42.3601] as [number, number], title: "Boston Harbor", value: "7.5 pH", type: "Water Quality", numericValue: 35 },
+        
+        // Soil Samples
+        { coordinates: [-93.2650, 44.9778] as [number, number], title: "Minneapolis", value: "6.1 pH", type: "Soil Sample", numericValue: 61 },
+        { coordinates: [-122.6750, 45.5152] as [number, number], title: "Portland", value: "5.8 pH", type: "Soil Sample", numericValue: 28 },
+        { coordinates: [-104.9903, 39.7392] as [number, number], title: "Denver", value: "7.0 pH", type: "Soil Sample", numericValue: 42 },
+        
+        // Weather Stations
+        { coordinates: [-84.3880, 33.7490] as [number, number], title: "Atlanta", value: "24°C", type: "Weather Station", numericValue: 24 },
+        { coordinates: [-121.4944, 38.5816] as [number, number], title: "Sacramento", value: "28°C", type: "Weather Station", numericValue: 28 },
+        { coordinates: [-90.0715, 29.9511] as [number, number], title: "New Orleans", value: "31°C", type: "Weather Station", numericValue: 31 },
+        
+        // Additional varied data points
+        { coordinates: [-112.0740, 33.4484] as [number, number], title: "Phoenix", value: "142 μg/m³", type: "Air Quality", numericValue: 142 },
+        { coordinates: [-117.1611, 32.7157] as [number, number], title: "San Diego", value: "38 μg/m³", type: "Air Quality", numericValue: 38 },
+        { coordinates: [-82.4584, 27.9506] as [number, number], title: "Tampa", value: "52 μg/m³", type: "Air Quality", numericValue: 52 },
+        { coordinates: [-115.1398, 36.1699] as [number, number], title: "Las Vegas", value: "98 μg/m³", type: "Air Quality", numericValue: 98 },
+        { coordinates: [-97.7431, 30.2672] as [number, number], title: "Austin", value: "67 μg/m³", type: "Air Quality", numericValue: 67 },
+        { coordinates: [-86.7816, 36.1627] as [number, number], title: "Nashville", value: "55 μg/m³", type: "Air Quality", numericValue: 55 },
       ];
 
-      // Add markers for sample data
+      // Function to get marker color based on value
+      const getMarkerColor = (numericValue: number) => {
+        if (numericValue <= 50) return '#10b981'; // Good - green
+        if (numericValue <= 100) return '#f59e0b'; // Moderate - yellow/orange
+        if (numericValue <= 150) return '#ef4444'; // Poor - red
+        return '#6b7280'; // Very Poor - gray
+      };
+
+      // Add markers for sample data with color coding
       sampleData.forEach((point) => {
         const popup = new mapboxgl.default.Popup({ offset: 25 }).setHTML(
-          `<div class="p-2">
-            <h3 class="font-semibold text-sm">${point.title}</h3>
-            <p class="text-xs text-gray-600">Air Quality: ${point.value}</p>
+          `<div class="p-3 min-w-[200px]">
+            <h3 class="font-semibold text-sm text-gray-900">${point.title}</h3>
+            <p class="text-xs text-gray-600 mb-1">Type: ${point.type}</p>
+            <p class="text-xs font-medium ${
+              point.numericValue <= 50 ? 'text-green-600' :
+              point.numericValue <= 100 ? 'text-orange-600' :
+              point.numericValue <= 150 ? 'text-red-600' : 'text-gray-600'
+            }">Value: ${point.value}</p>
+            <div class="mt-2 text-xs text-gray-500">
+              Quality: ${
+                point.numericValue <= 50 ? 'Good' :
+                point.numericValue <= 100 ? 'Moderate' :
+                point.numericValue <= 150 ? 'Poor' : 'Very Poor'
+              }
+            </div>
           </div>`
         );
 
         const marker = new mapboxgl.default.Marker({
-          color: '#2563eb',
+          color: getMarkerColor(point.numericValue),
           scale: 0.8
         })
           .setLngLat(point.coordinates)
